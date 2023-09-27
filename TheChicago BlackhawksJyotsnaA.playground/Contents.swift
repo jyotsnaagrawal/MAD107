@@ -11,7 +11,7 @@ var teamMembers: [Int: [String: Any]] = [
     8: ["name": "Ryan Donato", "age": 23, "country": "USA", "height": 6.0, "birthday": "1996-04-09"],
     58: ["name": "MacKenzie Entwistle", "age": 31, "country": "Canada", "height": 6.3, "birthday": "1999-07-14"],
     92: ["name": "Michal Teply", "age": 22, "country": "CZE", "height": 6.3, "birthday": "2001-05-27"],
-    // Add more players here...
+    
 ]
 
 // Create empty arrays to store player information
