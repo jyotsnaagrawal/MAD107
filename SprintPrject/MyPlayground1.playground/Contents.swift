@@ -13,20 +13,28 @@ class User {
     }
 }
 
+// Create a subclass of User for Admin users with additional properties
+class AdminUser: User {
+    var isAdmin: Bool  // Declare a property to specify if the user is an admin.
+
+    init(username: String, email: String, fullName: String, isAdmin: Bool) {
+        self.isAdmin = isAdmin  // Initialize the isAdmin property with the provided value.
+        super.init(username: username, email: email, fullName: fullName)  // Initialize the inherited properties from User.
+    }
+}
+
 // Define a UserDatabase to manage user accounts
 class UserDatabase {
     var users: [User] = []  // Declare an array to store user objects.
 
     // Register a new user
-    func register(username: String, email: String, password: String) -> User? {
-        // Check if the email is already registered
-        if users.contains(where: { $0.email == email }) {
-            return nil // Return nil if the email is already in use (registration failed).
+    func register(user: User) -> User? {
+        if users.contains(where: { $0.email == user.email }) {
+            return nil  // Return nil if the email is already in use (registration failed).
         }
 
-        let newUser = User(username: username, email: email, fullName: username)  // Create a new User object.
-        users.append(newUser)  // Add the new user to the array of users.
-        return newUser  // Return the newly registered user.
+        users.append(user)  // Add the user to the array of users.
+        return user  // Return the newly registered user.
     }
 
     // Login a user
@@ -38,20 +46,21 @@ class UserDatabase {
         return nil  // Return nil if login is unsuccessful (user not found).
     }
 }
-    
+
 let userDatabase = UserDatabase()  // Create an instance of the UserDatabase.
 
 // Register a new user
-if let newUser = userDatabase.register(username: "Jyotsna", email: "jyotsna@gmail.com", password: "password123") {
-    print("Registration successful! User: \(newUser.fullName)")  // Print a success message with the user's full name.
+let newUser = User(username: "Jyotsna", email: "jyotsna@gmail.com", fullName: "Jyotsna")  // Create a new User object.
+if let registeredUser = userDatabase.register(user: newUser) {
+    print("Registration successful! User: \(registeredUser.fullName)")  // Print a success message with the user's full name.
 } else {
     print("Registration failed. Email already in use.")  // Print a failure message (email already in use).
-
 }
 
-// Login
-if let loggedInUser = userDatabase.login(email: "jyotsna@gmail.com", password: "password123") {
-    print("Login successful! Welcome, \(loggedInUser.fullName)")  // Print a success message with the user's full name.
+// Create an AdminUser
+let adminUser = AdminUser(username: "Jyotsna", email: "Jyotsna@gmail.com", fullName: "Jyotsna Agrawal", isAdmin: true)  // Create a new AdminUser object.
+if let registeredAdmin = userDatabase.register(user: adminUser) {
+    print("User registration successful! User: \(registeredAdmin.fullName)")  // Print a success message for admin user registration.
 } else {
-    print("Login failed. Invalid email or password.")  // Print a failure message (login failed).
+    print("User registration failed. Email already in use.")  // Print a failure message (admin email already in use).
 }
