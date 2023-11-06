@@ -1,66 +1,125 @@
 import UIKit
 
-// Define a User class to represent a user's profile
-class User {
-    var username: String  // Declare a property to store the username.
-    var email: String     // Declare a property to store the email.
-    var fullName: String  // Declare a property to store the full name.
+// Defining an enum for predefined expense categories
+enum ExpenseCategory {
+    case groceries
+    case utilities
+    case diningOut
+    case transportation
+    // Here I can Add more predefined categories as needed
 
-    init(username: String, email: String, fullName: String) {
-        self.username = username   // Initialize the username property with the provided value.
-        self.email = email         // Initialize the email property with the provided value.
-        self.fullName = fullName   // Initialize the full name property with the provided value.
-    }
-}
-
-// Create a subclass of User for Admin users with additional properties
-class AdminUser: User {
-    var isAdmin: Bool  // Declare a property to specify if the user is an admin.
-
-    init(username: String, email: String, fullName: String, isAdmin: Bool) {
-        self.isAdmin = isAdmin  // Initialize the isAdmin property with the provided value.
-        super.init(username: username, email: email, fullName: fullName)  // Initialize the inherited properties from User.
-    }
-}
-
-// Define a UserDatabase to manage user accounts
-class UserDatabase {
-    var users: [User] = []  // Declare an array to store user objects.
-
-    // Register a new user
-    func register(user: User) -> User? {
-        if users.contains(where: { $0.email == user.email }) {
-            return nil  // Return nil if the email is already in use (registration failed).
+    // Custom method to return a user-friendly description
+    func description() -> String {
+        switch self {
+        case .groceries:
+            return "Groceries"
+        case .utilities:
+            return "Utilities"
+        case .diningOut:
+            return "Dining Out"
+        case .transportation:
+            return "Transportation"
+    
         }
-
-        users.append(user)  // Add the user to the array of users.
-        return user  // Return the newly registered user.
-    }
-
-    // Login a user
-    func login(email: String, password: String) -> User? {
-        if let user = users.first(where: { $0.email == email }) {
-            // Check password (not implemented here for simplicity)
-            return user  // Return the user if the email is found in the user database.
-        }
-        return nil  // Return nil if login is unsuccessful (user not found).
     }
 }
 
-let userDatabase = UserDatabase()  // Create an instance of the UserDatabase.
+// Define a class for Expense
+class Expense {
+    var name: String
+    var amount: Double
+    var date: Date
+    var category: ExpenseCategory
+    var notes: String?
+    var tags: Set<String> // Using a set to store tags
+    var isDeductible: Bool // Property to indicate if the expense is deductible
 
-// Register a new user
-let newUser = User(username: "Jyotsna", email: "jyotsna@gmail.com", fullName: "Jyotsna")  // Create a new User object.
-if let registeredUser = userDatabase.register(user: newUser) {
-    print("Registration successful! User: \(registeredUser.fullName)")  // Print a success message with the user's full name.
-} else {
-    print("Registration failed. Email already in use.")  // Print a failure message (email already in use).
+    init(name: String, amount: Double, date: Date, category: ExpenseCategory, notes: String? = nil, isDeductible: Bool = false, tags: Set<String> = []) {
+        self.name = name
+        self.amount = amount
+        self.date = date
+        self.category = category
+        self.notes = notes
+        self.tags = tags
+        self.isDeductible = isDeductible
+    }
 }
 
-// Create an AdminUser
-let adminUser = AdminUser(username: "Jyotsna", email: "Jyotsna@gmail.com", fullName: "Jyotsna Agrawal", isAdmin: true)  // Create a new AdminUser object.
-if let registeredAdmin = userDatabase.register(user: adminUser) {
-    print("User registration successful! User: \(registeredAdmin.fullName)")  // Print a success message for admin user registration.
-} else {
-    print("User registration failed. Email already in use.")  // Print a failure message (admin email already in use).
+// Define a class for User Profiles
+class UserProfile {
+    var username: String
+    var email: String
+    var fullName: String
+    var profilePicture: UIImage?
+    var expenses: [Expense] = []
+    var predefinedCategories: [ExpenseCategory] = []
+    var customCategories: [String] = []
+
+    init(username: String, email: String, fullName: String, profilePicture: UIImage? = nil) {
+        self.username = username
+        self.email = email
+        self.fullName = fullName
+        self.profilePicture = profilePicture
+    }
+
+    // Add an expense to the user's profile
+    func addExpense(expense: Expense) {
+        expenses.append(expense)
+    }
+
+    // Add a predefined category to the user's profile
+    func addPredefinedCategory(category: ExpenseCategory) {
+        predefinedCategories.append(category)
+    }
+
+    // Add a custom category to the user's profile
+    func addCustomCategory(category: String) {
+        customCategories.append(category)
+    }
 }
+
+// Example usage:
+let user1 = UserProfile(username: "user1", email: "user1@example.com", fullName: "User One")
+let user2 = UserProfile(username: "user2", email: "user2@example.com", fullName: "User Two")
+
+// Add predefined and custom categories to user1
+user1.addPredefinedCategory(category: .diningOut)
+user1.addPredefinedCategory(category: .utilities)
+user1.addCustomCategory(category: "Entertainment")
+
+// Add expenses with categories, tags, and deductibility
+let deductibleExpense = Expense(name: "Business lunch", amount: 60.0, date: Date(), category: .diningOut, isDeductible: true, tags: ["business"])
+let nonDeductibleExpense = Expense(name: "Personal dinner", amount: 40.0, date: Date(), category: .diningOut, isDeductible: false, tags: ["personal"])
+
+user1.addExpense(expense: deductibleExpense)
+user1.addExpense(expense: nonDeductibleExpense)
+
+let expense3 = Expense(name: "Entertainment", amount: 20.0, date: Date(), category: .utilities, notes: "Movie night", tags: ["movies", "entertainment"])
+user1.addExpense(expense: expense3)
+
+let expense4 = Expense(name: "Utility bill", amount: 100.0, date: Date(), category: .diningOut, notes: "Electricity bill", tags: ["bills", "utilities"])
+user2.addExpense(expense: expense4)
+
+// Print user profiles, categories, and expenses
+print("User 1 Profile:")
+print("Username: \(user1.username)")
+print("Email: \(user1.email)")
+print("Full Name: \(user1.fullName)")
+print("Predefined Categories: \(user1.predefinedCategories.map { $0.description() }.joined(separator: ", "))")
+print("Custom Categories: \(user1.customCategories.joined(separator: ", "))")
+
+print("\nUser 2 Profile:")
+print("Username: \(user2.username)")
+print("Email: \(user2.email)")
+print("Full Name: \(user2.fullName)")
+
+print("\nUser 1 Expenses:")
+for expense in user1.expenses {
+    print("- \(expense.name): $\(expense.amount), Category: \(expense.category.description()), Tags: \(expense.tags.joined(separator: ", ")), Deductible: \(expense.isDeductible ? "Yes" : "No")")
+}
+
+print("\nUser 2 Expenses:")
+for expense in user2.expenses {
+    print("- \(expense.name): $\(expense.amount), Category: \(expense.category.description()), Tags: \(expense.tags.joined(separator: ", ")), Deductible: \(expense.isDeductible ? "Yes" : "No")")
+}
+
